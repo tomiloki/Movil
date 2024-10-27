@@ -4,7 +4,7 @@ import db from "@/libs/db";
 import bcrypt from "bcrypt";
 import { signIn } from "next-auth/react";
 
-const authOptions = {
+ export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
