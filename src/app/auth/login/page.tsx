@@ -14,6 +14,11 @@ function LoginPage() {
     const router = useRouter()
     const [error, setError] = useState<string | null>(null);
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+      setShowPassword((prev) => !prev); // Cambia entre true y false
+    };
 
     const onSubmit = handleSubmit(async (data) => {
       console.log(data)
@@ -68,20 +73,30 @@ function LoginPage() {
         <label htmlFor="password" className='text-slate-500 mb-2 block text-sm'>
             Password:
         </label>
-        <input type="password"
-            {...register("password", { 
-                required: {
-                    value: true,
-                    message: "Password is required" }
-                } )}
-            className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
-            placeholder='********'
-        />
-        {
-            errors.password && (
-                <span className= "text-red-500 text-sm">{String(errors.password.message)}</span>
-            )
-        }
+        <div className="flex items-center bg-slate-900 rounded mb-2">
+          <input 
+            type={showPassword ? 'text' : 'password'}
+              {...register("password", { 
+                  required: {
+                      value: true,
+                      message: "Password is required" }
+                  } )}
+              className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
+              placeholder='********'
+          />
+
+            <span
+                onClick={togglePasswordVisibility}
+                className="p-3 cursor-pointer text-slate-500" // Ajustes de posición y estilo
+            >👁️
+            </span>
+
+          {
+              errors.password && (
+                  <span className= "text-red-500 text-sm">{String(errors.password.message)}</span>
+              )
+          }
+        </div>
 
           <button className='w-full bg-blue-500 text-white p-3 rounded-lg mt-2'>
             Login

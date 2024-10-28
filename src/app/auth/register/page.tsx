@@ -1,14 +1,28 @@
 "use client";
 import {useForm} from 'react-hook-form'
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 function RegisterPage() {
     const { 
-        register, 
+        register,
+        reset,
         handleSubmit, 
         formState: {errors} 
     } = useForm();
     const router = useRouter()
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev); // Cambia entre true y false
+    };
+
+    const handleClear = () => {
+        reset(); // Limpia todos los valores del formulario
+      };
 
     const onSubmit = handleSubmit(async (data) => {
 
@@ -93,15 +107,30 @@ function RegisterPage() {
         <label htmlFor="password" className='text-slate-500 mb-2 block text-sm'>
             Password:
         </label>
-        <input type="password"
-            {...register("password", { 
-                required: {
-                    value: true,
-                    message: "Password is required" }
-                } )}
-            className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
-            placeholder='********'
-        />
+        <div className="flex items-center bg-slate-900 rounded mb-2">
+            <input 
+                type={showPassword ? 'text' : 'password'} // Alterna entre texto y contraseña
+                {...register("password", { 
+                    required: {
+                        value: true,
+                        message: "Password is required" 
+                    },
+                    pattern: {
+                        value: passwordRegex,
+                        message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo."
+                    }
+                })}
+                className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
+                placeholder='********'
+            />
+
+            <span
+                onClick={togglePasswordVisibility}
+                className="p-3 cursor-pointer text-slate-500" // Ajustes de posición y estilo
+            >👁️
+            </span>
+        </div>
+
         {
             errors.password && (
                 <span className= "text-red-500 text-sm">{String(errors.password.message)}</span>
@@ -130,12 +159,19 @@ function RegisterPage() {
         }
 
 
+        <div>
+            <button className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2'>
+            Register
+            </button>
 
-        <button className='w-full bg-blue-500 text-white p-3 rounded-lg mt-2'>
-          Register
-        </button>
+            <button type="button" onClick={handleClear} className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2'>
+            Limpiar
+            </button>
+        </div>
+
       </form>
     </div>
+    
   );
 }
 
