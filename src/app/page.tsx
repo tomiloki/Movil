@@ -1,11 +1,28 @@
-function HomePage() {
-  return (
-    <section className="h-[calc(100vh-7rem)] flex justify-center items-center">
-            <div>
-                <h1 className="text-white text-5xl">Home Page</h1>
-            </div>
-        </section>
-  )
+// app/page.js
+"use client"; // Marca solo esta página como cliente
+
+import { SessionProvider, useSession } from 'next-auth/react';
+
+export default function Home() {
+    return (
+        <SessionProvider>
+            <HomeContent />
+        </SessionProvider>
+    );
 }
 
-export default HomePage
+function HomeContent() {
+    const { data: session } = useSession();
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            {session?.user?.name ? (
+                <h1 className="text-2xl font-bold text-white">
+                    Bienvenido, {session.user.name}!
+                </h1>
+            ) : (
+                <h1 className="text-2xl text-white font-bold">Bienvenido a la aplicación!</h1>
+            )}
+        </div>
+    );
+}

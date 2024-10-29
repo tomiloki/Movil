@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import db from "@/libs/db";
 import bcrypt from "bcrypt";
-import { signIn } from "next-auth/react";
+import GoogleProvider from "next-auth/providers/google";
 
  export const authOptions = {
     providers: [
@@ -32,7 +32,13 @@ import { signIn } from "next-auth/react";
                     email: userFound.email,
                 }
             }
-        })
+        }),
+        
+        GoogleProvider({
+            clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+        
     ],
     pages: {
         signIn: "/auth/login",

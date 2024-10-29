@@ -160,11 +160,11 @@ function RegisterPage() {
 
 
         <div>
-            <button className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2'>
+            <button className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2 transition duration-300 transform hover:scale-105'>
             Register
             </button>
 
-            <button type="button" onClick={handleClear} className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2'>
+            <button type="button" onClick={handleClear} className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2 transition duration-300 transform hover:scale-105'>
             Limpiar
             </button>
         </div>
