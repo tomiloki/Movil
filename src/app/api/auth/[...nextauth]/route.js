@@ -38,12 +38,47 @@ import GoogleProvider from "next-auth/providers/google";
             clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
-        
+
     ],
     pages: {
         signIn: "/auth/login",
-    }
-}
+    },
+
+    callbacks: {
+        async signIn({ user, account, profile }) {
+            if (account.provider === 'google') {
+                // Busca usuario existente
+                const existingUser = await db.user.findUnique({
+                    where: { email: profile.email }
+                });
+
+                // Si el usuario no existe, créalo en la base de datos
+                if (!existingUser) {
+                    await db.user.create({
+                        data: {
+                            email: profile.email,
+                            username: profile.email.split('@')[0], // Deriva el username del email
+                            image: profile.picture,
+                        }
+                    });
+                }
+            }
+            return true;
+        },
+
+        async session({ session, token }) {
+            if (token) {
+                session.user.id = token.sub;
+            }
+            return session;
+        },
+
+        async redirect({ url, baseUrl }) {
+            return baseUrl + "/dashboard";
+        }
+    },
+};
+
 
 const handler = NextAuth(authOptions);
 

@@ -96,7 +96,7 @@ function LoginPage() {
           <button 
             type="button" 
             onClick={() => router.push('/auth/reset-password')}
-            className="text-blue-500 underline text-sm mb-4"
+            className="text-bgDark underline text-sm mb-4"
           >
             ¿Olvidaste tu contraseña?
           </button>
@@ -108,12 +108,17 @@ function LoginPage() {
 
           {/* Botón de Login con Google */}
           <button
-            type="button"
-            onClick={() => signIn("google")}
-            className="w-full bg-primaryBlue text-bgDark font-semibold p-3 rounded-lg mt-4 transition duration-300 transform hover:scale-105"
-          >
-            Continuar con Google
-          </button>
+                onClick={() => signIn("google")}
+                className="flex items-center justify-center w-full bg-white text-black font-semibold py-2 rounded-lg mt-2 shadow hover:bg-gray-100 transition duration-300 transform hover:scale-105"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24" height="24" className="mr-2">
+                    <path fill="#4285F4" d="M24 9.5c3.1 0 5.9 1.1 8.1 3.2l6-6C34.3 3.5 29.4 1 24 1 14.9 1 7.4 6.5 4 14l7.1 5.5C12.9 13.6 17.9 9.5 24 9.5z"/>
+                    <path fill="#34A853" d="M46.9 24.5c0-1.6-.2-3.2-.5-4.7H24v9h13.1c-1.1 5-4.5 8.6-8.6 11.2l7 5.5c5.6-5.1 9.4-12.5 9.4-20.5z"/>
+                    <path fill="#FBBC05" d="M10.9 28.5c-1-2.5-1.6-5.2-1.6-8s.6-5.5 1.6-8l-7.1-5.5C2.5 10.6 1 17.1 1 24s1.5 13.4 4.8 18.5l7.1-5.5z"/>
+                    <path fill="#EA4335" d="M24 47c6.5 0 11.9-2.2 15.9-5.8l-7-5.5c-2.3 1.6-5.3 2.5-8.9 2.5-6.9 0-12.9-4.7-15-11.1l-7.1 5.5C7.4 41.5 14.9 47 24 47z"/>
+                </svg>
+                <span>Continuar con Google</span>
+            </button>
 
         </form>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-import {useForm} from 'react-hook-form'
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -8,9 +8,9 @@ function RegisterPage() {
         register,
         reset,
         handleSubmit, 
-        formState: {errors} 
+        formState: { errors } 
     } = useForm();
-    const router = useRouter()
+    const router = useRouter();
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
@@ -22,157 +22,143 @@ function RegisterPage() {
 
     const handleClear = () => {
         reset(); // Limpia todos los valores del formulario
-      };
+    };
 
     const onSubmit = handleSubmit(async (data) => {
-
         if (data.password !== data.confirmPassword) {
             return alert("Password do not match");
         }
 
         const res = await fetch('/api/auth/register', {
             method: 'POST',
-            body: JSON.stringify(
-                {
-                    username: data.username,
-                    email: data.email,
-                    password: data.password
-                }
-        ),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+            body: JSON.stringify({
+                username: data.username,
+                email: data.email,
+                password: data.password,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        });
+
         if (res.ok) {
-            router.push("../auth/login")
+            router.push("../auth/login");
         }
-        console.log(res)
-    })
+    });
 
-    console.log(errors)
+    return (
+        <div className="flex justify-center items-center min-h-screen bg-bgDark text-textLight p-4">
+            <form onSubmit={onSubmit} className="w-full max-w-md p-6 rounded-lg shadow-lg bg-gray-800">
+                <h1 className="text-3xl font-bold text-primaryBlue mb-8 text-center">Registro</h1>
 
+                {/* Campo de Username */}
+                <div className="mb-4">
+                    <label htmlFor="username" className="block text-sm font-medium text-textLight mb-2">
+                        Nombre de usuario:
+                    </label>
+                    <input 
+                        type="text"
+                        {...register("username", { 
+                            required: {
+                                value: true,
+                                message: "Username is required",
+                            },
+                        })}
+                        className="p-3 rounded w-full bg-slate-900 text-slate-300 placeholder-grayAccent focus:outline-none focus:ring-2 focus:ring-primaryBlue"
+                        placeholder="YourUser1234"
+                    />
+                    {errors.username && (
+                        <span className="text-red-500 text-sm">{String(errors.username.message)}</span>
+                    )}
+                </div>
 
+                {/* Campo de Email */}
+                <div className="mb-4">
+                    <label htmlFor="email" className="block text-sm font-medium text-textLight mb-2">
+                        Email:
+                    </label>
+                    <input 
+                        type="email"
+                        {...register("email", {
+                            required: {
+                                value: true,
+                                message: "Email is required",
+                            },
+                        })}
+                        className="p-3 rounded w-full bg-slate-900 text-slate-300 placeholder-grayAccent focus:outline-none focus:ring-2 focus:ring-primaryBlue"
+                        placeholder="user@email.com"
+                    />
+                    {errors.email && (
+                        <span className="text-red-500 text-sm">{String(errors.email.message)}</span>
+                    )}
+                </div>
 
-  return (
-    <div className='h-[calc(100vh-7rem)] flex justify-center items-center'>
-      <form onSubmit={onSubmit} className='w-1/4'>
-        <h1 className='text-slate-200 font-bold text-4x1 mb-4'>
-            Register
-        </h1>
+                {/* Campo de Password */}
+                <div className="mb-4">
+                    <label htmlFor="password" className="block text-sm font-medium text-textLight mb-2">
+                        Contraseña:
+                    </label>
+                    <div className="flex items-center bg-slate-900 rounded">
+                        <input 
+                            type={showPassword ? 'text' : 'password'}
+                            {...register("password", { 
+                                required: {
+                                    value: true,
+                                    message: "Password is required",
+                                },
+                                pattern: {
+                                    value: passwordRegex,
+                                    message: "Debe tener 8 caracteres, mayúscula, minúscula, número y símbolo.",
+                                },
+                            })}
+                            className="p-3 rounded-l w-full bg-slate-900 text-slate-300 placeholder-grayAccent focus:outline-none focus:ring-2 focus:ring-primaryBlue"
+                            placeholder="********"
+                        />
+                        <span
+                            onClick={togglePasswordVisibility}
+                            className="p-3 cursor-pointer text-slate-500"
+                        >👁️</span>
+                    </div>
+                    {errors.password && (
+                        <span className="text-red-500 text-sm">{String(errors.password.message)}</span>
+                    )}
+                </div>
 
+                {/* Campo de Confirmar Password */}
+                <div className="mb-4">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-textLight mb-2">
+                        Confirmar contraseña:
+                    </label>
+                    <input 
+                        type="password"
+                        {...register("confirmPassword", { 
+                            required: {
+                                value: true,
+                                message: "Confirm password is required",
+                            },
+                        })}
+                        className="p-3 rounded w-full bg-slate-900 text-slate-300 placeholder-grayAccent focus:outline-none focus:ring-2 focus:ring-primaryBlue"
+                        placeholder="********"
+                    />
+                    {errors.confirmPassword && (
+                        <span className="text-red-500 text-sm">{String(errors.confirmPassword.message)}</span>
+                    )}
+                </div>
 
+                {/* Botón de Registro */}
+                <button className="w-full bg-blue-500 text-bgDark font-semibold p-3 rounded-lg mt-2 transition duration-300 transform hover:scale-105">
+                    Registrar
+                </button>
 
-        <label htmlFor="username" className='text-slate-500 mb-2 block text-sm'>
-            Username:
-        </label>
-        <input type="text"
-            {...register("username", { 
-                required: {
-                    value: true,
-                    message: "Username is required"
-                    }
-            } )}
-            className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
-            placeholder='YourUser1234'
-        />
-        {
-            errors.username && (
-                <span className= "text-red-500 text-sm">{String(errors.username.message)}</span>
-            )
-        }
-
-
-
-        <label htmlFor="email" className='text-slate-500 mb-2 block text-sm'>
-            Email:
-        </label>
-        <input type="email"
-            {...register("email", {
-                required: {
-                    value: true,
-                    message: "Email is required"
-                    }
-            } )}
-            className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
-            placeholder='user@email.com'
-        />
-        {
-            errors.email && (
-                <span className= "text-red-500 text-sm">{String(errors.email.message)}</span>
-            )
-        }
-
-
-
-        <label htmlFor="password" className='text-slate-500 mb-2 block text-sm'>
-            Password:
-        </label>
-        <div className="flex items-center bg-slate-900 rounded mb-2">
-            <input 
-                type={showPassword ? 'text' : 'password'} // Alterna entre texto y contraseña
-                {...register("password", { 
-                    required: {
-                        value: true,
-                        message: "Password is required" 
-                    },
-                    pattern: {
-                        value: passwordRegex,
-                        message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo."
-                    }
-                })}
-                className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
-                placeholder='********'
-            />
-
-            <span
-                onClick={togglePasswordVisibility}
-                className="p-3 cursor-pointer text-slate-500" // Ajustes de posición y estilo
-            >👁️
-            </span>
+                {/* Botón de Limpiar */}
+                <button 
+                    type="button" 
+                    onClick={handleClear} 
+                    className="w-full bg-blue-500 text-bgDark font-semibold p-3 rounded-lg mt-2 transition duration-300 transform hover:scale-105"
+                >
+                    Limpiar
+                </button>
+            </form>
         </div>
-
-        {
-            errors.password && (
-                <span className= "text-red-500 text-sm">{String(errors.password.message)}</span>
-            )
-        }
-
-
-
-        <label htmlFor="confirmPassword" className='text-slate-500 mb-2 block text-sm'>
-            Confirm Password:
-        </label>
-
-        <input type="password"
-            {...register("confirmPassword", { 
-                required: {
-                    value: true,
-                    message: "Confirm password is required" }
-                } )}
-            className='p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full'
-            placeholder='********'
-        />
-        {
-            errors.confirmPassword && (
-                <span className= "text-red-500 text-sm">{String(errors.confirmPassword.message)}</span>
-            )
-        }
-
-
-        <div>
-            <button className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2 transition duration-300 transform hover:scale-105'>
-            Register
-            </button>
-
-            <button type="button" onClick={handleClear} className='w-full bg-blue-500 text-white px-30 py-2 rounded-lg mt-2 transition duration-300 transform hover:scale-105'>
-            Limpiar
-            </button>
-        </div>
-
-      </form>
-    </div>
-    
-  );
+    );
 }
 
 export default RegisterPage;

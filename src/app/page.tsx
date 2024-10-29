@@ -1,4 +1,3 @@
-// app/page.js
 "use client"; // Marca solo esta página como cliente
 
 import { SessionProvider, useSession } from 'next-auth/react';
@@ -15,13 +14,15 @@ function HomeContent() {
     const { data: session } = useSession();
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-bgDark text-textLight p-4">
             {session?.user?.name ? (
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="text-3xl font-bold text-primaryBlue text-center">
                     Bienvenido, {session.user.name}!
                 </h1>
             ) : (
-                <h1 className="text-2xl text-white font-bold">Bienvenido a la aplicación!</h1>
+                <h1 className="text-3xl font-bold text-primaryBlue text-center">
+                    Bienvenido a la aplicación!
+                </h1>
             )}
         </div>
     );
