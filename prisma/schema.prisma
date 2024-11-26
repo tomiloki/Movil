@@ -8,10 +8,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 
 model User {
   id        Int      @id @default(autoincrement())
@@ -21,5 +23,48 @@ model User {
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+ // Relación con los viajes
+  trips     Trip[]
 }
 
+
+model User_Pasajero {
+  id_pasajero        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String?   @unique
+  password  String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+ // Relación con los viajes
+  trips     Trip[]
+}
+
+model User_Conductor {
+  id_conductor        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String?   @unique
+  password  String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+ // Relación con los viajes
+  trips     Trip[]
+}
+
+
+model Trip {
+  id          Int      @id @default(autoincrement())
+  destination String
+  capacity    Int
+  costPerPerson Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relación con el usuario conductor
+  id_conductor Int
+  conductor    User_Conductor     @relation(fields: [driverId], references: [id])
+}

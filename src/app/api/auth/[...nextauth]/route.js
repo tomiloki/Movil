@@ -74,7 +74,7 @@ import GoogleProvider from "next-auth/providers/google";
         },
 
         async redirect({ url, baseUrl }) {
-            return baseUrl + "/dashboard";
+            return baseUrl + "/";
         }
     },
 };

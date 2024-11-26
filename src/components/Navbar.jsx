@@ -19,7 +19,7 @@ async function Navbar() {
                     <Link href="/">Home</Link>
                 </li>
                 <li>
-                    <Link href="/auth/login">Login</Link>
+                    <Link href="/auth/prelogin">Login</Link>
                 </li>
                 <li>
                     <Link href="/auth/register">Register</Link>
