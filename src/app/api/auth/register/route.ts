@@ -1,61 +1,74 @@
-import { NextRequest, NextResponse } from 'next/server';
-import db from '@/libs/db'
-import bcrypt from 'bcrypt'
+import { NextRequest, NextResponse } from "next/server";
+import db from "@/libs/db";
+import bcrypt from "bcrypt";
 
 export async function POST(request: NextRequest) {
-    try {
-        const data = await request.json();
-        
+  try {
+    const data = await request.json();
 
-        const userFound = await db.user.findUnique({
-            where: {
-                email: data.email
-            }
-        })
+    // Log de los datos entrantes
+    console.log("Data recibida:", data);
 
-        if (userFound) {
-            return NextResponse.json({
-                message: 'Email already exists'
-            }, {
-                status: 400
-            })
-        }
+    // Verificar si el email ya existe
+    const userFound = await db.user.findUnique({
+      where: { email: data.email },
+    });
 
-
-
-        const usernameFound = await db.user.findUnique({
-            where: {
-                username: data.username
-            }
-        })
-
-        if (usernameFound) {
-            return NextResponse.json({
-                message: 'Username already exists'
-            }, {
-                status: 400
-            })
-        }
-
-
-
-        const hashedPassword = await bcrypt.hash(data.password, 10)
-        const newUser = await db.user.create({
-            data: {
-                username: data.username,
-                email: data.email,
-                password: hashedPassword
-            }
-        })
-
-        const{password: _, ...user} = newUser
-
-        return NextResponse.json(user)
-    } catch (error: any) {
-        return NextResponse.json({
-            message: error.message
-        }, {
-            status: 500
-        })
+    if (userFound) {
+      console.log("Email ya existe");
+      return NextResponse.json(
+        { message: "Email already exists" },
+        { status: 400 }
+      );
     }
+
+    // Verificar si el username ya existe
+    const usernameFound = await db.user.findUnique({
+      where: { username: data.username },
+    });
+
+    if (usernameFound) {
+      console.log("Username ya existe");
+      return NextResponse.json(
+        { message: "Username already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Validar el rol
+    if (!["DRIVER", "PASSENGER"].includes(data.role)) {
+      console.log("Rol inválido:", data.role);
+      return NextResponse.json(
+        { message: "Invalid role. Role must be DRIVER or PASSENGER." },
+        { status: 400 }
+      );
+    }
+
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    console.log("Contraseña hasheada:", hashedPassword);
+
+    // Crear el nuevo usuario
+    const newUser = await db.user.create({
+      data: {
+        username: data.username,
+        email: data.email,
+        password: hashedPassword,
+        role: data.role, // Rol del usuario
+      },
+    });
+
+    // Excluir contraseña del usuario devuelto
+    const { password, ...userWithoutPassword } = newUser;
+
+    console.log("Usuario creado exitosamente:", userWithoutPassword);
+
+    return NextResponse.json(userWithoutPassword, { status: 201 });
+  } catch (error: any) {
+    console.error("Error en el servidor:", error.message);
+    return NextResponse.json(
+      { message: "Error en el servidor. Intenta nuevamente más tarde." },
+      { status: 500 }
+    );
+  }
 }

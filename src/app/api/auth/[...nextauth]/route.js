@@ -66,15 +66,23 @@ import GoogleProvider from "next-auth/providers/google";
             return true;
         },
 
-        async session({ session, token }) {
+        async session({ session, token, user }) {
             if (token) {
-                session.user.id = token.sub;
+              session.user.id = token.sub;
+              session.user.role = token.role; // Agregar rol a la sesión
             }
             return session;
-        },
+          },
+          
+          async jwt({ token, user }) {
+            if (user) {
+              token.role = user.role; // Agregar rol al token
+            }
+            return token;
+          },
 
         async redirect({ url, baseUrl }) {
-            return baseUrl + "/";
+            return baseUrl + "/home_conductor";
         }
     },
 };

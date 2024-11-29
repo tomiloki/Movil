@@ -8,63 +8,53 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Reemplaza con tu conexión a la base de datos
 }
-
 
 model User {
   id        Int      @id @default(autoincrement())
+  username  String   @unique
   email     String   @unique
-  username  String?   @unique
-  password  String?
-  image     String?
+  password  String
+  role      Role     @default(PASSENGER)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 
- // Relación con los viajes
-  trips     Trip[]
+  // Relaciones con los viajes
+  tripsAsConductor Trip[] @relation("ConductorTrips")
+  tripsAsPassenger TripOnPassenger[]
 }
-
-
-model User_Pasajero {
-  id_pasajero        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String?   @unique
-  password  String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
- // Relación con los viajes
-  trips     Trip[]
-}
-
-model User_Conductor {
-  id_conductor        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String?   @unique
-  password  String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
- // Relación con los viajes
-  trips     Trip[]
-}
-
 
 model Trip {
-  id          Int      @id @default(autoincrement())
-  destination String
-  capacity    Int
+  id            Int                 @id @default(autoincrement())
+  destination   String
+  capacity      Int
   costPerPerson Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  // Relación con el usuario conductor
-  id_conductor Int
-  conductor    User_Conductor     @relation(fields: [driverId], references: [id])
+  // Relación con el conductor (un viaje tiene un conductor)
+  conductor   User @relation("ConductorTrips", fields: [conductorId], references: [id])
+  conductorId Int
+
+  // Relación con pasajeros (muchos pasajeros por viaje)
+  passengers TripOnPassenger[]
+}
+
+model TripOnPassenger {
+  id      Int   @id @default(autoincrement())
+  tripId  Int
+  userId  Int
+  createdAt DateTime @default(now())
+
+  // Relaciones
+  trip Trip @relation(fields: [tripId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  PASSENGER
+  DRIVER
 }

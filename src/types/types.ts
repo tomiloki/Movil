@@ -1,13 +1,10 @@
 // types.ts
-export interface Trip {
+export type Trip = {
     id: number;
     destination: string;
     capacity: number;
     costPerPerson: number;
-    createdAt: string;
-    updatedAt: string;
-    driverId: number;
-}
+  };
 
 export interface User {
     id: number;

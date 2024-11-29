@@ -1,5 +1,3 @@
-// src/types/next-auth.d.ts
-
 import NextAuth from "next-auth";
 
 declare module "next-auth" {
@@ -9,6 +7,12 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      role: "DRIVER" | "PASSENGER"; // Extender el tipo
     };
+  }
+
+  interface User {
+    id: string;
+    role: "DRIVER" | "PASSENGER";
   }
 }
