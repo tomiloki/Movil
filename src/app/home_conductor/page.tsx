@@ -1,15 +1,19 @@
+// app/home_conductor/page.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-type Trip = {
+interface Trip {
   id: number;
+  origin: string;
   destination: string;
+  departure: string;
   capacity: number;
   costPerPerson: number;
-};
+}
 
 export default function HomeConductor() {
   const { data: session, status } = useSession();
@@ -17,36 +21,37 @@ export default function HomeConductor() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
+    origin: "",
     destination: "",
+    departure: "",
     capacity: "",
     costPerPerson: "",
   });
 
   useEffect(() => {
-    console.log("Session:", session);
-    
+    if (status === "loading") return;
+
     if (status === "unauthenticated") {
       router.push("/auth/login");
     } else if (session?.user?.role !== "DRIVER") {
       router.push("/");
     } else {
-      fetchTrips(session.user.id);
+      fetchTrips();
     }
   }, [session, status]);
 
-  const fetchTrips = async (conductorId: string | undefined) => {
-    if (!conductorId) {
-      console.error("Conductor ID no está definido");
-      return;
-    }
-  
+  const fetchTrips = async () => {
     try {
-      const response = await fetch(`/api/trips?conductorId=${conductorId}`);
+      const response = await fetch(
+        `/api/trips?conductorId=${session?.user.id}`
+      );
       if (response.ok) {
         const data: Trip[] = await response.json();
         setTrips(data);
       } else {
-        console.error(`Error al cargar los viajes: ${response.statusText}`);
+        console.error(
+          `Error al cargar los viajes: ${response.statusText}`
+        );
       }
     } catch (error) {
       console.error("Error al cargar los viajes:", error);
@@ -56,32 +61,52 @@ export default function HomeConductor() {
   const handleCreateTrip = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { destination, capacity, costPerPerson } = formData;
+    const {
+      origin,
+      destination,
+      departure,
+      capacity,
+      costPerPerson,
+    } = formData;
 
-    if (!destination || !capacity || !costPerPerson) {
+    if (
+      !origin ||
+      !destination ||
+      !departure ||
+      !capacity ||
+      !costPerPerson
+    ) {
       alert("Todos los campos son obligatorios.");
       return;
     }
 
     try {
-      const response = await fetch("/api/trips/create", {
+      const response = await fetch("/api/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          origin,
           destination,
+          departure,
           capacity: parseInt(capacity),
           costPerPerson: parseFloat(costPerPerson),
-          conductorId: session?.user.id,
         }),
       });
 
       if (response.ok) {
         const newTrip: Trip = await response.json();
         setTrips((prevTrips) => [...prevTrips, newTrip]);
-        setIsModalOpen(false); // Cierra el modal
-        setFormData({ destination: "", capacity: "", costPerPerson: "" }); // Resetea el formulario
+        setIsModalOpen(false);
+        setFormData({
+          origin: "",
+          destination: "",
+          departure: "",
+          capacity: "",
+          costPerPerson: "",
+        });
       } else {
-        console.error("Error al crear el viaje.");
+        const errorData = await response.json();
+        console.error(`Error al crear el viaje: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Error al crear el viaje:", error);
@@ -90,11 +115,18 @@ export default function HomeConductor() {
 
   const handleDeleteTrip = async (id: number) => {
     try {
-      const response = await fetch(`/api/trips/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/trips/${id}`, {
+        method: "DELETE",
+      });
       if (response.ok) {
-        setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== id));
+        setTrips((prevTrips) =>
+          prevTrips.filter((trip) => trip.id !== id)
+        );
       } else {
-        console.error("Error al eliminar el viaje.");
+        const errorData = await response.json();
+        console.error(
+          `Error al eliminar el viaje: ${errorData.message}`
+        );
       }
     } catch (error) {
       console.error("Error al eliminar el viaje:", error);
@@ -109,14 +141,8 @@ export default function HomeConductor() {
     <div className="min-h-screen bg-gray-900 text-white">
       <header className="bg-gray-800 p-4 flex justify-between items-center">
         <h1 className="text-xl font-bold">
-          Hola, {session?.user?.name} (Conductor)
+          Hola, {session?.user?.username}
         </h1>
-        <button
-          onClick={() => signOut()}
-          className="bg-red-500 px-4 py-2 rounded"
-        >
-          Cerrar sesión
-        </button>
       </header>
       <main className="p-6">
         <button
@@ -135,7 +161,12 @@ export default function HomeConductor() {
                   className="bg-gray-800 p-4 rounded mb-2 flex justify-between"
                 >
                   <div>
+                    <p>Origen: {trip.origin}</p>
                     <p>Destino: {trip.destination}</p>
+                    <p>
+                      Fecha y Hora de Salida:{" "}
+                      {new Date(trip.departure).toLocaleString()}
+                    </p>
                     <p>Capacidad: {trip.capacity}</p>
                     <p>Costo por persona: ${trip.costPerPerson}</p>
                   </div>
@@ -158,8 +189,25 @@ export default function HomeConductor() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-gray-800 p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-4">Crear nuevo viaje</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Crear nuevo viaje
+            </h2>
             <form onSubmit={handleCreateTrip}>
+              {/* Campo para 'origin' */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">
+                  Origen:
+                </label>
+                <input
+                  type="text"
+                  value={formData.origin}
+                  onChange={(e) =>
+                    setFormData({ ...formData, origin: e.target.value })
+                  }
+                  className="w-full p-2 bg-gray-700 text-white rounded"
+                />
+              </div>
+              {/* Campo para 'destination' */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">
                   Destino:
@@ -168,11 +216,32 @@ export default function HomeConductor() {
                   type="text"
                   value={formData.destination}
                   onChange={(e) =>
-                    setFormData({ ...formData, destination: e.target.value })
+                    setFormData({
+                      ...formData,
+                      destination: e.target.value,
+                    })
                   }
                   className="w-full p-2 bg-gray-700 text-white rounded"
                 />
               </div>
+              {/* Campo para 'departure' */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">
+                  Fecha y Hora de Salida:
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.departure}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      departure: e.target.value,
+                    })
+                  }
+                  className="w-full p-2 bg-gray-700 text-white rounded"
+                />
+              </div>
+              {/* Campo para 'capacity' */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">
                   Capacidad:
@@ -181,11 +250,15 @@ export default function HomeConductor() {
                   type="number"
                   value={formData.capacity}
                   onChange={(e) =>
-                    setFormData({ ...formData, capacity: e.target.value })
+                    setFormData({
+                      ...formData,
+                      capacity: e.target.value,
+                    })
                   }
                   className="w-full p-2 bg-gray-700 text-white rounded"
                 />
               </div>
+              {/* Campo para 'costPerPerson' */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">
                   Costo por persona:

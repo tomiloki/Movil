@@ -14,46 +14,49 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
   password  String
-  role      Role     @default(PASSENGER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  role      Role      @default(PASSENGER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  // Relaciones con los viajes
-  tripsAsConductor Trip[] @relation("ConductorTrips")
+  // Relaciones
+  tripsAsConductor Trip[]             @relation("ConductorTrips")
   tripsAsPassenger TripOnPassenger[]
+
+  // Opcionalmente, puedes agregar otros campos o relaciones según tus necesidades
 }
 
 model Trip {
-  id            Int                 @id @default(autoincrement())
-  origin        String       // Nuevo campo
-  destination   String
-  departure     DateTime     // Nuevo campo
-  capacity      Int
-  costPerPerson Float
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             Int               @id @default(autoincrement())
+  origin         String
+  destination    String
+  departure      DateTime
+  capacity       Int
+  costPerPerson  Float
+  conductorId    Int
+  conductor      User              @relation("ConductorTrips", fields: [conductorId], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
-  // Relación con el conductor (un viaje tiene un conductor)
-  conductor   User @relation("ConductorTrips", fields: [conductorId], references: [id])
-  conductorId Int
-
-  // Relación con pasajeros (muchos pasajeros por viaje)
-  passengers TripOnPassenger[]
+  // Relaciones
+  passengers     TripOnPassenger[]
 }
 
 model TripOnPassenger {
-  id      Int   @id @default(autoincrement())
-  tripId  Int
-  userId  Int
-  createdAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  tripId    Int
+  userId    Int
+  createdAt DateTime   @default(now())
 
   // Relaciones
-  trip Trip @relation(fields: [tripId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  trip      Trip      @relation(fields: [tripId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  // Evitar duplicados
+  @@unique([tripId, userId])
 }
 
 enum Role {
