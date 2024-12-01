@@ -1,17 +1,20 @@
 import prisma from "../../../libs/db";
 
 export default async function handler(req, res) {
-  const { id } = req.query;
-
   if (req.method !== "GET") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
-    const tripId = parseInt(id);
-
-    const trip = await prisma.trip.findUnique({
-      where: { id: tripId },
+    const trips = await prisma.trip.findMany({
+      where: {
+        departure: {
+          gte: new Date(),
+        },
+        capacity: {
+          gt: 0,
+        },
+      },
       include: {
         conductor: {
           select: {
@@ -23,13 +26,9 @@ export default async function handler(req, res) {
       },
     });
 
-    if (!trip) {
-      return res.status(404).json({ message: "Trip not found" });
-    }
-
-    res.status(200).json(trip);
+    res.status(200).json(trips);
   } catch (error) {
-    console.error("Error fetching trip:", error);
-    res.status(500).json({ message: "Error fetching trip" });
+    console.error("Error fetching available trips:", error);
+    res.status(500).json({ message: "Error fetching available trips" });
   }
 }

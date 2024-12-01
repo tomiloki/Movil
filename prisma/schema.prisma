@@ -29,7 +29,9 @@ model User {
 
 model Trip {
   id            Int                 @id @default(autoincrement())
+  origin        String       // Nuevo campo
   destination   String
+  departure     DateTime     // Nuevo campo
   capacity      Int
   costPerPerson Float
   createdAt     DateTime @default(now())

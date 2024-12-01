@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 function LoginPage() {
     const {
@@ -14,6 +15,8 @@ function LoginPage() {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const { update } = useSession();
+
 
     const togglePasswordVisibility = () => {
       setShowPassword((prev) => !prev); // Cambia entre true y false
@@ -29,9 +32,11 @@ function LoginPage() {
       if (res?.error) {
         setError(res.error);
       } else {
-        router.push('/');
-        router.refresh();
+        await update(); // Actualizar la sesión
+        router.push("/");
+        // router.refresh(); // Ya no es necesario
       }
+      
     });
 
     return (
