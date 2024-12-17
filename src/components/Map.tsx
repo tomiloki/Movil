@@ -2,9 +2,8 @@
 
 "use client";
 
-import React from "react";
-import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
-import { useState } from "react";
+import React, { useState } from "react";
+import { GoogleMap, useLoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 
 interface MarkerData {
   id: number;
@@ -44,31 +43,36 @@ const markers: MarkerData[] = [
 ];
 
 const Map: React.FC = () => {
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+  });
+
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
 
-  return (
-    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={4}>
-        {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            position={marker.position}
-            onClick={() => setSelectedMarker(marker)}
-          />
-        ))}
+  if (loadError) return <div>Error al cargar el mapa</div>;
+  if (!isLoaded) return <div>Cargando...</div>;
 
-        {selectedMarker && (
-          <InfoWindow
-            position={selectedMarker.position}
-            onCloseClick={() => setSelectedMarker(null)}
-          >
-            <div>
-              <h2>{selectedMarker.title}</h2>
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
-    </LoadScript>
+  return (
+    <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={4}>
+      {markers.map((marker) => (
+        <Marker
+          key={marker.id}
+          position={marker.position}
+          onClick={() => setSelectedMarker(marker)}
+        />
+      ))}
+
+      {selectedMarker && (
+        <InfoWindow
+          position={selectedMarker.position}
+          onCloseClick={() => setSelectedMarker(null)}
+        >
+          <div>
+            <h2>{selectedMarker.title}</h2>
+          </div>
+        </InfoWindow>
+      )}
+    </GoogleMap>
   );
 };
 
