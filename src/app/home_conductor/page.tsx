@@ -141,7 +141,7 @@ export default function HomeConductor() {
     <div className="min-h-screen bg-gray-900 text-white">
       <header className="bg-gray-800 p-4 flex justify-between items-center">
         <h1 className="text-xl font-bold">
-          Hola, {session?.user?.username}
+          Hola, {session?.user?.name}
         </h1>
       </header>
       <main className="p-6">

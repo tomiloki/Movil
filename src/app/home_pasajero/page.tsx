@@ -64,7 +64,7 @@ function HomePasajero() {
   return (
     <div className="min-h-screen bg-bgDark text-textLight p-4">
       <h1 className="text-3xl font-bold text-primaryBlue mb-8 text-center">
-        Bienvenido, {session.user.username}
+        Bienvenido, {session.user.name}
       </h1>
       <h2 className="text-2xl mb-4">Viajes Disponibles:</h2>
       {trips.length === 0 ? (
