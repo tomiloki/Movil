@@ -23,17 +23,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si el username ya existe
-    const usernameFound = await db.user.findUnique({
-      where: { username: data.username },
-    });
-
-    if (usernameFound) {
-      console.log("Username ya existe");
-      return NextResponse.json(
-        { message: "Username already exists" },
-        { status: 400 }
-      );
-    }
 
     // Validar el rol
     if (!["DRIVER", "PASSENGER"].includes(data.role)) {
@@ -51,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Crear el nuevo usuario
     const newUser = await db.user.create({
       data: {
-        username: data.username,
+        name: data.name,
         email: data.email,
         password: hashedPassword,
         role: data.role, // Rol del usuario

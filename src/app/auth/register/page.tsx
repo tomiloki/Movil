@@ -33,7 +33,7 @@ function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       body: JSON.stringify({
-        username: data.username,
+        name: data.name,
         email: data.email,
         password: data.password,
         role: data.role, // Incluye el rol en los datos enviados
@@ -61,25 +61,25 @@ function RegisterPage() {
         {/* Campo de Username */}
         <div className="mb-4">
           <label
-            htmlFor="username"
+            htmlFor="name"
             className="block text-sm font-medium text-textLight mb-2"
           >
             Nombre de usuario:
           </label>
           <input
             type="text"
-            {...register("username", {
+            {...register("name", {
               required: {
                 value: true,
-                message: "Username is required",
+                message: "name is required",
               },
             })}
             className="p-3 rounded w-full bg-slate-900 text-slate-300 placeholder-grayAccent focus:outline-none focus:ring-2 focus:ring-primaryBlue"
             placeholder="YourUser1234"
           />
-          {errors.username && (
+          {errors.name && (
             <span className="text-red-500 text-sm">
-              {String(errors.username.message)}
+              {String(errors.name.message)}
             </span>
           )}
         </div>

@@ -1,4 +1,4 @@
-// app/api/auth/[...nextauth]/route.ts
+// src/app/api/auth/[...nextauth]/route.ts
 
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -15,29 +15,47 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        // **1. Validar que las credenciales existan**
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email y contraseña son requeridos");
+        }
+
+        // **2. Buscar al usuario en la base de datos**
         const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
+          where: { email: credentials.email },
           select: {
             id: true,
-            username: true,
+            name: true,
             email: true,
             role: true,
             password: true,
           },
         });
 
-        if (!user) throw new Error("No user found");
+        // **3. Verificar si el usuario existe**
+        if (!user) {
+          throw new Error("No se encontró el usuario");
+        }
 
+        // **4. Verificar que la contraseña no sea null**
+        if (!user.password) {
+          throw new Error("La contraseña del usuario es nula");
+        }
+
+        // **5. Comparar las contraseñas**
         const isValidPassword = await bcrypt.compare(
-          credentials!.password,
+          credentials.password,
           user.password
         );
 
-        if (!isValidPassword) throw new Error("Incorrect password");
+        if (!isValidPassword) {
+          throw new Error("Contraseña incorrecta");
+        }
 
+        // **6. Retornar el objeto del usuario sin la contraseña**
         return {
           id: user.id.toString(),
-          username: user.username,
+          name: user.name,
           email: user.email,
           role: user.role,
         };
