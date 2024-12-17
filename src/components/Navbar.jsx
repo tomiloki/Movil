@@ -34,6 +34,9 @@ function Navbar() {
             <li>
               <Link href="/auth/register">Registrarse</Link>
             </li>
+            <li>
+              <Link href="/mapa">Mapa</Link>
+            </li>
           </>
         ) : (
           // Usuario autenticado
@@ -50,6 +53,9 @@ function Navbar() {
                 <li>
                   <Link href="/driver/trips">Mis Viajes</Link>
                 </li>
+                <li>
+                  <Link href="/mapa">Mapa</Link>
+                </li>
               </>
             ) : (
               // Enlaces para pasajeros
@@ -62,6 +68,9 @@ function Navbar() {
                 </li>
                 <li>
                   <Link href="/passenger/bookings">Mis Reservas</Link>
+                </li>
+                <li>
+                  <Link href="/mapa">Mapa</Link>
                 </li>
               </>
             )}

@@ -9,7 +9,7 @@ export type Trip = {
 export interface User {
     id: number;
     email: string;
-    username?: string;
+    name?: string;
     image?: string;
     createdAt: string;
     updatedAt: string;
